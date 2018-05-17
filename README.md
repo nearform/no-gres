@@ -1,0 +1,168 @@
+# No-Gres
+
+A small module to mock [pg](https://www.npmjs.com/package/pg) for testing purposes.
+
+[![js-standard-style][1]][2]
+
+* Includes support for async/await, promise and callback styles.
+* Check
+
+1. [Install](#install)
+2. [Usage](#usage)
+2. [API](#API)
+
+## Install
+
+```sh
+npm install --save-dev @nearform/no-gres
+```
+## Usage
+```
+const assert = require('assert')
+const Client = require('@nearform/no-gres').Client
+const myTestedModule = require('./myTestedModule')
+
+const doTest = async () => {
+  const dbClient = new Client()
+
+  // Set expectations and result
+  dbClient.expect(
+    /SELECT firstname, lastname FROM ORDERS WHERE customerId = \$1/i,
+    [123],
+    [
+      { firstname: 'Mal', lastname: 'Reynolds' },
+      { firstname: 'Jayne', lastname: 'Cobb' }
+    ])
+  // Returns the parameters passed so that they can be used for assertions or more expecations
+
+  dbClient.connect() // Queries will error if this is not called first
+
+  const result = await myTestedModule.fetchOrdersForCustomer(dbClient, 123)
+  dbClient.done() // Check all expectations are met - will error if not
+
+  // Assert results
+  assert.deepStrictEqual(result, ['Mal Reynolds', 'Jayne Cobb'])
+}
+
+doTest()
+
+```
+
+## API
+### constructor
+```
+const Client = new noGres.Client()
+```
+
+### throwOnConnect(err)
+```
+Client.errorOnConnect(new Error('Unknown  Host'))
+```
+Used to simulate an error during connection.  The error supplied will be either throw or used in promise rejection, depending on how `connect` is called.
+
+### connect([callback])
+This must be called before any queries happen, which follows the behaviour of the real [pg](https://www.npmjs.com/package/pg) api.  You can make this simulate an error (e.g. to test error handling) by use of the [throwOnConnect](#throwOnConnect(err)) method.
+```
+// callback
+Client.connect((err) => {
+    console.error(err)
+    // ...do stuff
+})
+
+// promise
+Client.connect()
+.catch((err) => {
+    console.error(err)
+})
+.then(() => {
+    // ...do stuff
+}
+
+// async
+try {
+    await Client.connect()
+} catch(err) {
+    console.error(err)
+}
+// ...do stuff
+
+```
+
+### expect(sql, [params], [returns])
+This sets an expectation that a call will be made to the `query` function of the client.  It can be called multiple times to set a sequence of expectations.  Any unmatched call or a call out of sequence will cause the `query` call to generate an error.
+
+`sql` - A string or regular expression which will be compared to the string passed to the `query` function
+
+`params` - An optional array of parameters which will be matched against those passed to the
+`query` function
+
+`returns` - An optional array of "rows" to be returned by the `query` call.
+
+Returns the parameters used on the call as an objects.  Handy for re-using the values later in the test:
+```
+const { sql, params, returns } = client.expect('select * from orders where id = $1', [123], [])
+client.expect(sql, [456], [{id: 456}])
+client.expect(sql, params, returns)
+
+let res
+res = await orders.fetchById(client, 123)
+assert.deepStrictEqual(res, [])
+res = orders.fetchById(client, 456)
+assert.deepStrictEqual(res, [456])
+res = await orders.fetchById(client, 123)
+assert.deepStrictEqual(res, [])
+
+```
+
+### query (sql, params, [callback])
+### query (config, [callback])
+Mock of the [pg](https://www.npmjs.com/package/pg) query function.
+`sql` - sql statement to run
+`params` - parameter array for the sql
+`callback` - optional (err, data) callback.  If not supplied, a promise will be returned.
+`config` - object containing `text` and `values` for the sql and parameters, respectively.  Used for compatibility with the real api.
+```
+const order = await client.query('select * from orders where id = $1, [123])
+
+const product = client.query({
+    text: 'select * from products where category = $1',
+    values: ['games']
+    }, (err, data) => {
+        if (err) {
+            return console.error(err)
+        }
+        return data
+    })
+```
+
+### done()
+Verifies that all expectations have been met.  Will throw an error if they have not.
+```
+await client.expect(/select/, [])
+client.done()
+
+//Error: Unresolved expectations: [
+//  {
+//    "sql": {},
+//    "params": [],
+//    "returns": []
+//  }
+//]
+
+```
+
+### reset()
+Removes all pending expectations and allows the client to be re-used
+```
+client.expect(/select/, [])
+client.reset()
+client.done()
+```
+
+## License
+
+Copyright nearForm Ltd 2018. Licensed under [MIT][license].
+
+[1]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
+[2]: https://github.com/feross/standard
+[license]: ./LICENSE
