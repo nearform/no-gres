@@ -5,11 +5,16 @@ A small module to mock [pg](https://www.npmjs.com/package/pg) for testing purpos
 [![js-standard-style][1]][2]
 
 * Includes support for async/await, promise and callback styles.
-* Check
+* Verifies that all expected sql statements are called, and with matching parameters
+* Verifies sql statements are called in the correct sequence
+* Can strict match sql string equality or use regular expressions
+* Allows return values for each statement to be defined
 
 1. [Install](#install)
 2. [Usage](#usage)
-2. [API](#API)
+3. [API](#API)
+4. [Example Code](#Example-Code)
+
 
 ## Install
 
@@ -20,32 +25,30 @@ npm install --save-dev @nearform/no-gres
 ```
 const assert = require('assert')
 const Client = require('@nearform/no-gres').Client
-const myTestedModule = require('./myTestedModule')
+const fetchCustomer = require('./fetchCustomer')
 
 const doTest = async () => {
   const dbClient = new Client()
 
   // Set expectations and result
   dbClient.expect(
-    /SELECT firstname, lastname FROM ORDERS WHERE customerId = \$1/i,
-    [123],
+    /SELECT firstname, lastname FROM customer WHERE id = \$1/i,
+    [2],
     [
-      { firstname: 'Mal', lastname: 'Reynolds' },
       { firstname: 'Jayne', lastname: 'Cobb' }
     ])
   // Returns the parameters passed so that they can be used for assertions or more expecations
 
-  dbClient.connect() // Queries will error if this is not called first
+  await dbClient.connect() // Queries will error if this is not called first
+  const result = await fetchCustomer.fetchCustomerById(dbClient, 2)
 
-  const result = await myTestedModule.fetchOrdersForCustomer(dbClient, 123)
   dbClient.done() // Check all expectations are met - will error if not
 
   // Assert results
-  assert.deepStrictEqual(result, ['Mal Reynolds', 'Jayne Cobb'])
+  assert.deepStrictEqual(result, ['Jayne Cobb'])
 }
 
-doTest()
-
+module.exports = doTest
 ```
 
 ## API
@@ -158,6 +161,9 @@ client.expect(/select/, [])
 client.reset()
 client.done()
 ```
+
+## Example Code
+See the `example` directory of this project for sample code testing a module against both no-gres and a real PG client instance.
 
 ## License
 

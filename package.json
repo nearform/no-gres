@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=test lab -cva code",
     "lint": "standard",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "pg-test": "node example"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   "devDependencies": {
     "code": "^5.2.0",
     "lab": "^15.4.4",
+    "pg": "^7.4.3",
     "standard": "^11.0.1"
   }
 }
