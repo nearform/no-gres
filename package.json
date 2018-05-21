@@ -4,17 +4,31 @@
   "description": "Mock pg-node for testing",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test lab -cva code",
+    "test": "NODE_ENV=test lab --coverage-exclude node_modules -cva code",
     "lint": "standard",
     "posttest": "npm run lint",
-    "pg-test": "node example"
+    "pg-test": "node example",
+    "ci-cov": "NODE_ENV=test lab -r html --coverage-exclude node_modules -o coverage.html -cva code"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nearform/no-gres.git"
   },
-  "author": "nearForm Ltd",
-  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "pg",
+    "postgres",
+    "postgresql",
+    "test",
+    "mock",
+    "stub",
+    "spy"
+  ],
+  "author": "Matt Robinson <matt.robinson@nearform.com>",
+  "license": "Apache-2.0",
+  "engines" : { "node" : ">= 8.0.0" },
   "devDependencies": {
     "code": "^5.2.0",
     "lab": "^15.4.4",
