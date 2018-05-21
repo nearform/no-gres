@@ -1,0 +1,24 @@
+{
+  "name": "@nearform/no-gres",
+  "version": "1.0.0",
+  "description": "Mock pg-node for testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test lab -cva code",
+    "lint": "standard",
+    "posttest": "npm run lint",
+    "pg-test": "node example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nearform/no-gres.git"
+  },
+  "author": "nearForm Ltd",
+  "license": "MIT",
+  "devDependencies": {
+    "code": "^5.2.0",
+    "lab": "^15.4.4",
+    "pg": "^7.4.3",
+    "standard": "^11.0.1"
+  }
+}
