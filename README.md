@@ -167,7 +167,7 @@ See the `example` directory of this project for sample code testing a module aga
 
 ## License
 
-Copyright nearForm Ltd 2018. Licensed under [MIT][license].
+Copyright nearForm Ltd 2018. Licensed under [Apache 2.0][license].
 
 [1]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
 [2]: https://github.com/feross/standard
