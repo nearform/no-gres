@@ -1,6 +1,6 @@
 {
   "name": "@nearform/no-gres",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mock pg-node for testing",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,9 @@
   ],
   "author": "Matt Robinson <matt.robinson@nearform.com>",
   "license": "Apache-2.0",
-  "engines" : { "node" : ">= 8.0.0" },
+  "engines": {
+    "node": ">= 8.0.0"
+  },
   "devDependencies": {
     "code": "^5.2.0",
     "lab": "^15.4.4",
