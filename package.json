@@ -28,7 +28,7 @@
   ],
   "author": "Matt Robinson <matt.robinson@nearform.com>",
   "license": "Apache-2.0",
-  "engines" : { "node" : ">= 7.10.0" },
+  "engines" : { "node" : ">= 8.0.0" },
   "devDependencies": {
     "code": "^5.2.0",
     "lab": "^15.4.4",
