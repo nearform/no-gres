@@ -40,6 +40,47 @@ const handleReturn = (err, value, cb) => {
   return err ? Promise.reject(err) : Promise.resolve(retVal)
 }
 
+class Pool {
+  constructor () {
+    this._client = new Client()
+  }
+
+  get client () {
+    return this._client
+  }
+
+  connect (cb) {
+    return this._client.connect(cb)
+  }
+
+  query (sql, params, cb) {
+    return this._client.connect()
+      .then(() => {
+        return this._client.query(sql, params, cb)
+      })
+  }
+
+  expect (...params) {
+    return this._client.expect(...params)
+  }
+
+  done () {
+    return this._client.done()
+  }
+
+  end (cb) {
+    return cb()
+  }
+
+  get expectations () {
+    return this._client.expectations
+  }
+
+  reset () {
+    this._client.reset()
+  }
+}
+
 class Client {
   constructor () {
     this._expectations = []
@@ -47,6 +88,10 @@ class Client {
 
   get expectations () {
     return this._expectations
+  }
+
+  get isConnected () {
+    return this._connected
   }
 
   // mocked pg node methods
@@ -65,7 +110,7 @@ class Client {
       return handleReturn(new Error('Attempted to query when client not connected'), null, cb)
     }
 
-    const nextExpectation = this._expectations.pop()
+    const nextExpectation = this._expectations.shift()
     if (!nextExpectation) {
       return handleReturn(new Error(`Unexpected query "${sql}".`), null, cb)
     }
@@ -77,7 +122,7 @@ class Client {
       return handleReturn(new Error(`Unexpected query "${sql}".\nExpected a regular expression matching ${nextExpectation.sql}`), null, cb)
     }
     if (nextExpectation.params && !arraysAreEqual(params, nextExpectation.params)) {
-      return handleReturn(new Error(`Unexpected params for query.\nExpected ${JSON.stringify(nextExpectation.params)}, got ${JSON.stringify(params)}.`), null, cb)
+      return handleReturn(new Error(`Unexpected params for query "${sql}".\nExpected ${JSON.stringify(nextExpectation.params)}, got ${JSON.stringify(params)}.`), null, cb)
     }
     return handleReturn(null, nextExpectation.returns, cb)
   }
@@ -109,6 +154,7 @@ class Client {
 
 module.exports = {
   Client,
+  Pool,
   native: {
     Client
   }
