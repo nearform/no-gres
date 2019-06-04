@@ -124,7 +124,7 @@ class Client {
     if (nextExpectation.params && !arraysAreEqual(params, nextExpectation.params)) {
       return handleReturn(new Error(`Unexpected params for query "${sql}".\nExpected ${JSON.stringify(nextExpectation.params)}, got ${JSON.stringify(params)}.`), null, cb)
     }
-    return handleReturn(null, nextExpectation.returns, cb)
+    return handleReturn(nextExpectation.throws, nextExpectation.returns, cb)
   }
 
   // mock configuration
@@ -137,7 +137,16 @@ class Client {
     if (params && !Array.isArray(params)) {
       throw new Error(`Unexpected params: ${JSON.stringify(params)}.  Should be an array.`)
     }
-    this._expectations.push({ sql, params, returns: copyArray(returns) })
+
+    let throws = null
+    if (returns instanceof Error) {
+      throws = returns
+      returns = undefined
+    } else {
+      returns = copyArray(returns)
+    }
+
+    this._expectations.push({ sql, params, returns, throws })
     return this.expectations[this.expectations.length - 1]
   }
 
