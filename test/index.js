@@ -315,11 +315,37 @@ describe('client', async () => {
 
 describe('pool', async () => {
   describe('connect', () => {
+    it('connects with the underlying client: callback', { plan: 3 }, () => {
+      const pool = new NoGres.Pool()
+      pool.connect((err, client) => {
+        expect(err).to.be.null()
+        expect(client).to.equal(pool.client)
+        expect(pool.client.isConnected).to.be.true()
+      })
+    })
+
     it('connects with the underlying client', { plan: 2 }, async () => {
       const pool = new NoGres.Pool()
-      const err = await pool.connect()
-      expect(err).to.be.null()
+      const client = await pool.connect()
+      expect(client).to.equal(pool.client)
       expect(pool.client.isConnected).to.be.true()
+    })
+
+    it('passes through underlying client error: callback', { plan: 3 }, () => {
+      const pool = new NoGres.Pool()
+      pool.client.errorOnConnect(new Error('bar'))
+      pool.connect((err, client) => {
+        expect(err).to.not.be.null()
+        expect(client).to.be.undefined()
+        expect(pool.client.isConnected).to.be.false()
+      })
+    })
+
+    it('passes through underlying client error', { plan: 2 }, async () => {
+      const pool = new NoGres.Pool()
+      pool.client.errorOnConnect(new Error('bar'))
+      await expect(pool.connect()).rejects(Error, 'bar')
+      expect(pool.client.isConnected).to.be.false()
     })
   })
   describe('query', async () => {

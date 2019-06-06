@@ -50,7 +50,14 @@ class Pool {
   }
 
   connect (cb) {
-    return this._client.connect(cb)
+    if (cb) {
+      return this._client.connect((err) => {
+        if (err) cb(err)
+        else cb(null, this._client)
+      })
+    } else {
+      return this._client.connect().then(() => this._client)
+    }
   }
 
   query (sql, params, cb) {
