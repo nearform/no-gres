@@ -134,6 +134,10 @@ class Client {
     return handleReturn(null, nextExpectation.returns, cb)
   }
 
+  // Used to release a client back to the pool; doesn't do anything here since no-gres has a single client per pool.
+  release () {
+  }
+
   // mock configuration
 
   errorOnConnect (err) {
