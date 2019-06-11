@@ -22,7 +22,7 @@ A small module to mock [pg](https://www.npmjs.com/package/pg) for testing purpos
 npm install --save-dev @nearform/no-gres
 ```
 ## Usage
-```
+```js
 const assert = require('assert')
 const Client = require('@nearform/no-gres').Client
 const fetchCustomer = require('./fetchCustomer')
@@ -53,19 +53,19 @@ module.exports = doTest
 
 ## API
 ### constructor
-```
+```js
 const Client = new noGres.Client()
 ```
 
 ### throwOnConnect(err)
-```
+```js
 Client.errorOnConnect(new Error('Unknown  Host'))
 ```
 Used to simulate an error during connection.  The error supplied will be either throw or used in promise rejection, depending on how `connect` is called.
 
 ### connect([callback])
 This must be called before any queries happen, which follows the behaviour of the real [pg](https://www.npmjs.com/package/pg) api.  You can make this simulate an error (e.g. to test error handling) by use of the [throwOnConnect](#throwOnConnect(err)) method.
-```
+```js
 // callback
 Client.connect((err) => {
     console.error(err)
@@ -102,7 +102,7 @@ This sets an expectation that a call will be made to the `query` function of the
 `returns` - An optional array or an Error instance. If an array, it will represent the "rows" to be returned by the `query` call. If an Error, the associated query will fail with this error. By default, an empty rowset is returned.
 
 Returns the parameters used on the call as an objects.  Handy for re-using the values later in the test:
-```
+```js
 const { sql, params, returns } = client.expect('select * from orders where id = $1', [123], [])
 client.expect(sql, [456], [{id: 456}])
 client.expect(sql, params, returns)
@@ -124,7 +124,7 @@ Mock of the [pg](https://www.npmjs.com/package/pg) query function.
 `params` - parameter array for the sql
 `callback` - optional (err, data) callback.  If not supplied, a promise will be returned.
 `config` - object containing `text` and `values` for the sql and parameters, respectively.  Used for compatibility with the real api.
-```
+```js
 const order = await client.query('select * from orders where id = $1, [123])
 
 const product = client.query({
@@ -140,7 +140,7 @@ const product = client.query({
 
 ### done()
 Verifies that all expectations have been met.  Will throw an error if they have not.
-```
+```js
 await client.expect(/select/, [])
 client.done()
 
@@ -156,7 +156,7 @@ client.done()
 
 ### reset()
 Removes all pending expectations and allows the client to be re-used
-```
+```js
 client.expect(/select/, [])
 client.reset()
 client.done()
