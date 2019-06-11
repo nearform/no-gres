@@ -50,7 +50,14 @@ class Pool {
   }
 
   connect (cb) {
-    return this._client.connect(cb)
+    if (cb) {
+      return this._client.connect((err) => {
+        if (err) cb(err)
+        else cb(null, this._client)
+      })
+    } else {
+      return this._client.connect().then(() => this._client)
+    }
   }
 
   query (sql, params, cb) {
@@ -125,6 +132,10 @@ class Client {
       return handleReturn(new Error(`Unexpected params for query "${sql}".\nExpected ${JSON.stringify(nextExpectation.params)}, got ${JSON.stringify(params)}.`), null, cb)
     }
     return handleReturn(null, nextExpectation.returns, cb)
+  }
+
+  // Used to release a client back to the pool; doesn't do anything here since no-gres has a single client per pool.
+  release () {
   }
 
   // mock configuration
