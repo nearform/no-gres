@@ -17,13 +17,24 @@ describe('client', async () => {
 
     it('returns the generated expectation', () => {
       const client = new NoGres.Client()
-      const { sql, params, returns } = client.expect('foo', ['bar'], [{ name: 'fooRow' }, { name: 'barRow' }])
+      const { sql, params, returns, throws } = client.expect('foo', ['bar'], [{ name: 'fooRow' }, { name: 'barRow' }])
       expect(sql).to.equal('foo')
       expect(params.length).to.equal(1)
       expect(params[0]).to.equal('bar')
       expect(returns.length).to.equal(2)
       expect(returns[0].name).to.equal('fooRow')
       expect(returns[1].name).to.equal('barRow')
+      expect(throws).to.be.null()
+    })
+
+    it('throws the provided error', () => {
+      const client = new NoGres.Client()
+      const { sql, params, returns, throws } = client.expect('foo', ['bar'], new Error('some db error i cooked up'))
+      expect(sql).to.equal('foo')
+      expect(params.length).to.equal(1)
+      expect(params[0]).to.equal('bar')
+      expect(returns).to.be.undefined()
+      expect(throws.message).to.equal('some db error i cooked up')
     })
 
     it('throws an error if not all expectations are met', { plan: 1 }, () => {
@@ -310,16 +321,51 @@ describe('client', async () => {
 
       client.done()
     })
+
+    it('throws error when provided', { plan: 1 }, async () => {
+      const client = new NoGres.Client()
+      await client.connect()
+      const { sql, params, returns, throws } = client.expect('select * from orders where id = $1', [1, 2, 3], new Error('example error'))
+      await expect(client.query(sql, params)).to.reject(Error, 'example error')
+
+      client.done()
+    })
   })
 })
 
 describe('pool', async () => {
   describe('connect', () => {
+    it('connects with the underlying client: callback', { plan: 3 }, () => {
+      const pool = new NoGres.Pool()
+      pool.connect((err, client) => {
+        expect(err).to.be.null()
+        expect(client).to.equal(pool.client)
+        expect(pool.client.isConnected).to.be.true()
+      })
+    })
+
     it('connects with the underlying client', { plan: 2 }, async () => {
       const pool = new NoGres.Pool()
-      const err = await pool.connect()
-      expect(err).to.be.null()
+      const client = await pool.connect()
+      expect(client).to.equal(pool.client)
       expect(pool.client.isConnected).to.be.true()
+    })
+
+    it('passes through underlying client error: callback', { plan: 3 }, () => {
+      const pool = new NoGres.Pool()
+      pool.client.errorOnConnect(new Error('bar'))
+      pool.connect((err, client) => {
+        expect(err).to.not.be.null()
+        expect(client).to.be.undefined()
+        expect(pool.client.isConnected).to.be.false()
+      })
+    })
+
+    it('passes through underlying client error', { plan: 2 }, async () => {
+      const pool = new NoGres.Pool()
+      pool.client.errorOnConnect(new Error('bar'))
+      await expect(pool.connect()).rejects(Error, 'bar')
+      expect(pool.client.isConnected).to.be.false()
     })
   })
   describe('query', async () => {
