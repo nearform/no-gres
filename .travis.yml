@@ -5,5 +5,4 @@ node_js:
   - '12'
 os:
   - linux
-  - osx
 install: npm install
