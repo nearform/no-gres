@@ -285,10 +285,10 @@ test('client', t => {
       await client.connect()
       const { sql, params, returns } = client.expect('select * from orders where id = $1', [1, 2, 3], [{ name: 'foo' }, { name: 'bar' }])
       client.expect(sql, params, returns)
-      const res = await client.query({text: sql, values: params})
+      const res = await client.query({ text: sql, values: params })
       t.deepEqual(res.rows, returns)
       t.equals(res.rowCount, returns.length)
-      client.query({text: sql, values: params}, (err, cbRes) => {
+      client.query({ text: sql, values: params }, (err, cbRes) => {
         t.equals(err, null)
         t.equals(cbRes.rowCount, returns.length)
         t.deepEqual(cbRes.rows, returns)

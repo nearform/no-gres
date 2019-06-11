@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "pg": "^7.4.3",
-    "standard": "^11.0.1"
+    "standard": "^12.0.1"
   },
   "dependencies": {
     "tap": "^14.2.2"
