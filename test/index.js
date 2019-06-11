@@ -17,13 +17,24 @@ describe('client', async () => {
 
     it('returns the generated expectation', () => {
       const client = new NoGres.Client()
-      const { sql, params, returns } = client.expect('foo', ['bar'], [{ name: 'fooRow' }, { name: 'barRow' }])
+      const { sql, params, returns, throws } = client.expect('foo', ['bar'], [{ name: 'fooRow' }, { name: 'barRow' }])
       expect(sql).to.equal('foo')
       expect(params.length).to.equal(1)
       expect(params[0]).to.equal('bar')
       expect(returns.length).to.equal(2)
       expect(returns[0].name).to.equal('fooRow')
       expect(returns[1].name).to.equal('barRow')
+      expect(throws).to.be.null()
+    })
+
+    it('throws the provided error', () => {
+      const client = new NoGres.Client()
+      const { sql, params, returns, throws } = client.expect('foo', ['bar'], new Error('some db error i cooked up'))
+      expect(sql).to.equal('foo')
+      expect(params.length).to.equal(1)
+      expect(params[0]).to.equal('bar')
+      expect(returns).to.be.undefined()
+      expect(throws.message).to.equal('some db error i cooked up')
     })
 
     it('throws an error if not all expectations are met', { plan: 1 }, () => {
@@ -307,6 +318,15 @@ describe('client', async () => {
       const res2 = await client.query(sql2, params2)
       expect(res2.rows).to.equal(returns2)
       expect(res2.rowCount).to.equal(returns2.length)
+
+      client.done()
+    })
+
+    it('throws error when provided', { plan: 1 }, async () => {
+      const client = new NoGres.Client()
+      await client.connect()
+      const { sql, params, returns, throws } = client.expect('select * from orders where id = $1', [1, 2, 3], new Error('example error'))
+      await expect(client.query(sql, params)).to.reject(Error, 'example error')
 
       client.done()
     })

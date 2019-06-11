@@ -99,7 +99,7 @@ This sets an expectation that a call will be made to the `query` function of the
 `params` - An optional array of parameters which will be matched against those passed to the
 `query` function
 
-`returns` - An optional array of "rows" to be returned by the `query` call.
+`returns` - An optional array or an Error instance. If an array, it will represent the "rows" to be returned by the `query` call. If an Error, the associated query will fail with this error. By default, an empty rowset is returned.
 
 Returns the parameters used on the call as an objects.  Handy for re-using the values later in the test:
 ```
