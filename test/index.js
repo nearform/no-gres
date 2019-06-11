@@ -325,7 +325,7 @@ describe('client', async () => {
     it('throws error when provided', { plan: 1 }, async () => {
       const client = new NoGres.Client()
       await client.connect()
-      const { sql, params, returns, throws } = client.expect('select * from orders where id = $1', [1, 2, 3], new Error('example error'))
+      const { sql, params } = client.expect('select * from orders where id = $1', [1, 2, 3], new Error('example error'))
       await expect(client.query(sql, params)).to.reject(Error, 'example error')
 
       client.done()
