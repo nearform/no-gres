@@ -331,6 +331,18 @@ describe('client', async () => {
       client.done()
     })
   })
+
+  describe('events', () => {
+    it('can be used to manually simulate events', { plan: 2 }, async () => {
+      const client = new NoGres.Client()
+      await client.connect()
+      client.once('notification', ({ channel, payload }) => {
+        expect(channel).to.equal('sample')
+        expect(payload).to.equal('some string')
+      })
+      client.emit('notification', { channel: 'sample', payload: 'some string' })
+    })
+  })
 })
 
 describe('pool', async () => {

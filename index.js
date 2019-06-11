@@ -1,5 +1,7 @@
 'use strict'
 
+const EventEmitter = require('events')
+
 const arraysAreEqual = (arr1, arr2) => {
   // Handles nested arrays, but not objects
   if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
@@ -88,8 +90,9 @@ class Pool {
   }
 }
 
-class Client {
+class Client extends EventEmitter {
   constructor () {
+    super()
     this._expectations = []
   }
 
