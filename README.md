@@ -1,9 +1,8 @@
 # No-Gres
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/nearform/no-gres.svg)](https://greenkeeper.io/)
-
 A small module to mock [pg](https://www.npmjs.com/package/pg) for testing purposes.
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nearform/no-gres.svg)](https://greenkeeper.io/)
 [![js-standard-style][1]][2]
 
 * Includes support for async/await, promise and callback styles.
