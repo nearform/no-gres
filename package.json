@@ -4,11 +4,11 @@
   "description": "Mock pg-node for testing",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test lab --coverage-exclude node_modules -cva code",
+    "test": "standard && tap test/*.test.js --coverage --100",
+    "test:report": "standard && tap test/*.test.js --coverage  --coverage-report=html --100",
     "lint": "standard",
     "posttest": "npm run lint",
-    "pg-test": "node example",
-    "ci-cov": "NODE_ENV=test lab -r html --coverage-exclude node_modules -o coverage.html -cva code"
+    "pg-test": "node example"
   },
   "repository": {
     "type": "git",
@@ -32,9 +32,8 @@
     "node": ">= 8.0.0"
   },
   "devDependencies": {
-    "code": "^5.2.0",
-    "lab": "^15.4.4",
     "pg": "^7.4.3",
-    "standard": "^11.0.1"
+    "standard": "^12.0.1",
+    "tap": "^14.2.2"
   }
 }
