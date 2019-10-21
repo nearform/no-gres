@@ -34,6 +34,6 @@
   "devDependencies": {
     "pg": "^7.4.3",
     "standard": "^12.0.1",
-    "tap": "^14.2.2"
+    "tap": "^14.8.0"
   }
 }
