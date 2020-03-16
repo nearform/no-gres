@@ -137,7 +137,7 @@ test('client', t => {
     t.plan(2)
     const client = new NoGres.Client()
     await client.connect()
-    let { sql, params } = client.expect('select * from products where id = $1', [1, 2, 3])
+    const { sql, params } = client.expect('select * from products where id = $1', [1, 2, 3])
     t.rejects(client.query(`${sql} extra stuff`, params), `Unexpected query "${sql} extra stuff".\nExpected "${sql}"`)
     client.expect(sql, params)
     client.query(`${sql} extra stuff`, params, err => {
@@ -149,7 +149,7 @@ test('client', t => {
     t.plan(2)
     const client = new NoGres.Client()
     await client.connect()
-    let { sql, params } = client.expect(/foo/, [1, 2, 3])
+    const { sql, params } = client.expect(/foo/, [1, 2, 3])
     t.rejects(client.query('bar', [1, 2, 3]), `Unexpected query "bar".\nExpected a regular expression matching ${sql}`)
     client.expect(sql, params)
     client.query('bar', [1, 2, 3], err => {
