@@ -1,6 +1,6 @@
 {
   "name": "@nearform/no-gres",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Mock pg-node for testing",
   "main": "index.js",
   "scripts": {
